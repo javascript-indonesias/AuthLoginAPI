@@ -1,6 +1,5 @@
 import express from 'express';
 import path from 'path';
-import http from 'http';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
@@ -22,10 +21,8 @@ import workerPoolInit from './workers/init-workerpool';
 
 // here's our generic error handler for situations where we didn't handle
 // errors properly
-function notFound(req, res, next) {
-    res.status(404);
-    const error = new Error(`🔍 - Not Found - ${req.originalUrl}`);
-    next(error);
+function pageNotFoundMiddleware(_req, res) {
+    res.status(404).render('404');
 }
 
 function errorMiddleware(error, _req, res) {
@@ -67,6 +64,7 @@ function setupCloseOnExit(server) {
 
         if (options.exit) {
             if (options.exit) {
+                // eslint-disable-next-line no-process-exit
                 process.exit();
                 // throw new Error('Exit process.exit Node JS');
             }
@@ -134,7 +132,7 @@ function startServer({ port = process.env.PORT } = {}) {
     );
 
     // add the generic error handler just in case errors are missed by middleware
-    app.use(notFound);
+    app.use(pageNotFoundMiddleware);
     app.use(errorMiddleware);
     // I prefer dealing with promises. It makes testing easier, among other things.
     // So this block of code allows me to start the express app and resolve the

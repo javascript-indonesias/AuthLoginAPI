@@ -55,13 +55,46 @@ async function getDataUser(email) {
     }
 }
 
-async function getDataUserById(iduser) {
+async function getDataUserByUserId(userid) {
     try {
-        const userDb = await UserItem.findById(iduser).exec();
-        return Promise.resolve(userDb);
+        const userDb = await UserItem.find({ userids: userid }).exec();
+        if (userDb && userDb.length > 0) {
+            return Promise.resolve(userDb);
+        }
+        return Promise.reject(new Error(`User ID ${userid} tidak ditemukan`));
     } catch (err) {
-        return Promise.reject(err);
+        return Promise.reject(
+            new Error(
+                `User ID ${userid} tidak ditemukan ${JSON.stringify(err)}`,
+            ),
+        );
     }
 }
 
-export { createUser, createUserDb, getDataUser, getDataUserById };
+async function getDataUserByDocumentId(docid) {
+    try {
+        const userDb = await UserItem.findById(docid).exec();
+        if (userDb) {
+            return Promise.resolve(userDb);
+        }
+        return Promise.reject(
+            new Error(`Pengguna dengan ID ${docid} tidak ditemukan`),
+        );
+    } catch (err) {
+        return Promise.reject(
+            new Error(
+                `Pengguna dengan ID ${docid} tidak ditemukan ${JSON.stringify(
+                    err,
+                )}`,
+            ),
+        );
+    }
+}
+
+export {
+    createUser,
+    createUserDb,
+    getDataUser,
+    getDataUserByDocumentId,
+    getDataUserByUserId,
+};

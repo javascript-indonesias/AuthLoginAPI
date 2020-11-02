@@ -8,5 +8,6 @@ PORT=3200
 VERSIONAPP="v100"
 MONGODBURI=""
 NODE_ENV="development"
+SECRETJWT=""
 # NODE_ENV="production"
 
