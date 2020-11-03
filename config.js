@@ -9,4 +9,5 @@ module.exports = {
     version: process.env.VERSIONAPP,
     mongouri: process.env.MONGODBURI,
     mode: process.env.NODE_ENV,
+    secretjwt: process.env.SECRETJWT,
 };
