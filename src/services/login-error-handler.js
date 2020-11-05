@@ -1,5 +1,33 @@
 import logger from '../utils/config-winston';
 
+function handleErrorLogin(errorObject) {
+    const {
+        erremail: arrayErrEmail,
+        errpassword: arrayErrPassword,
+    } = errorObject;
+    const errObjectParsed = { email: '', password: '' };
+
+    if (arrayErrEmail.length > 0) {
+        let stringMessage = '';
+        arrayErrEmail.forEach((errvalue) => {
+            const { msg } = errvalue;
+            stringMessage += `${msg}. `;
+        });
+        errObjectParsed.email = stringMessage;
+    }
+
+    if (arrayErrPassword.length > 0) {
+        let stringMessage = '';
+        arrayErrPassword.forEach((errvalue) => {
+            const { msg } = errvalue;
+            stringMessage += `${msg}. `;
+        });
+        errObjectParsed.password = stringMessage;
+    }
+
+    return errObjectParsed;
+}
+
 function handleErrorLoginSignup(error) {
     const errorMessage = error.message;
     const errorObject = { email: '', password: '' };
@@ -33,4 +61,4 @@ function handleErrorLoginSignup(error) {
     return errorObject;
 }
 
-export default handleErrorLoginSignup;
+export { handleErrorLogin, handleErrorLoginSignup };

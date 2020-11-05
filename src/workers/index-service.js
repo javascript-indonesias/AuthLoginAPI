@@ -13,7 +13,27 @@ function runWorkerHashPassword(workerdata) {
         workerPoolInit
             .getWorkerPoolHashPassword()
             .runTask(workerdata, (errors, results) => {
-                const stringDebug = `${errors} ${results}`;
+                const stringDebug = `${JSON.stringify(errors)} ${JSON.stringify(
+                    results,
+                )}`;
+                logger.info(stringDebug);
+                if (errors) {
+                    reject(errors);
+                } else {
+                    resolve(results);
+                }
+            });
+    });
+}
+
+function runWorkerComparePassword(workerdata) {
+    return new Promise((resolve, reject) => {
+        workerPoolInit
+            .getWorkerPoolComparePassword()
+            .runTask(workerdata, (errors, results) => {
+                const stringDebug = `${JSON.stringify(errors)} ${JSON.stringify(
+                    results,
+                )}`;
                 logger.info(stringDebug);
                 if (errors) {
                     reject(errors);
@@ -30,7 +50,9 @@ function runWorkerSignJwt(workerdata) {
         workerPoolInit
             .getWorkerPoolSignJwt()
             .runTask(workerdata, (errors, results) => {
-                const stringDebug = `${errors} ${results}`;
+                const stringDebug = `${JSON.stringify(errors)} ${JSON.stringify(
+                    results,
+                )}`;
                 logger.info(stringDebug);
                 if (errors) {
                     reject(errors);
@@ -47,7 +69,9 @@ function runWorkerVerifyJwt(workerdata) {
         workerPoolInit
             .getWorkerPoolVerifyJwt()
             .runTask(workerdata, (errors, results) => {
-                const stringDebug = `${errors} ${results}`;
+                const stringDebug = `${JSON.stringify(errors)} ${JSON.stringify(
+                    results,
+                )}`;
                 logger.info(stringDebug);
                 if (errors) {
                     reject(errors);
@@ -138,6 +162,7 @@ export {
     runBubbleSortService,
     runWorkerPoolPrimeNumber,
     runWorkerHashPassword,
+    runWorkerComparePassword,
     runWorkerSignJwt,
     runWorkerVerifyJwt,
 };

@@ -8,12 +8,7 @@ import cookieParser from 'cookie-parser';
 import 'express-async-errors';
 import logger from './utils/config-winston';
 // all the routes for my app are retrieved from the src/routes/index.js module
-import {
-    getRoutes,
-    getCovidRouter,
-    getMockDataRouter,
-    getValidationTesRouter,
-} from './routes';
+import { getAuthAPIRouter, getViewRecipesRouter } from './routes';
 import { rateLimiter, speedLimiter } from './utils/options-value';
 import { corsAllRequest, corsRequest } from './utils/cors-options';
 import { mode } from '../config';
@@ -85,6 +80,7 @@ function setupCloseOnExit(server) {
 function startServer({ port = process.env.PORT } = {}) {
     // Inisialisasi worker thread pool
     workerPoolInit.startWorkerPoolHashPassword();
+    workerPoolInit.startWorkerPoolComparePassword();
     workerPoolInit.startWorkerPoolSignJwt();
     workerPoolInit.startWorkerPoolVerifyJwt();
 
@@ -111,6 +107,7 @@ function startServer({ port = process.env.PORT } = {}) {
     // Use rate limiter and speed limiter for prevent brute force and spamming attacks
     app.options('*', corsAllRequest);
 
+    // API router
     app.use(
         '/api/v1',
         rateLimiter,
@@ -118,17 +115,16 @@ function startServer({ port = process.env.PORT } = {}) {
         corsRequest,
         jsonBodyParser,
         helmet(),
-        getRoutes(),
+        getAuthAPIRouter(),
     );
 
-    app.use('/covid', rateLimiter, speedLimiter, corsRequest, getCovidRouter());
-    app.use('/', rateLimiter, speedLimiter, corsRequest, getMockDataRouter());
+    // Router view SSR EJS
     app.use(
         '/',
         rateLimiter,
         speedLimiter,
         corsRequest,
-        getValidationTesRouter(),
+        getViewRecipesRouter(),
     );
 
     // add the generic error handler just in case errors are missed by middleware

@@ -14,10 +14,15 @@ class WorkerPoolInit {
             __dirname,
             'verifyjwt-worker.js',
         );
+        this.pathWorkerComparePassword = path.resolve(
+            __dirname,
+            'comparepassword-worker.js',
+        );
 
         this.workerPoolHash = null;
         this.workerPoolSign = null;
         this.workerPoolVerify = null;
+        this.workerPoolComparePass = null;
     }
 
     startWorkerPoolHashPassword() {
@@ -29,6 +34,17 @@ class WorkerPoolInit {
 
     getWorkerPoolHashPassword() {
         return this.workerPoolHash;
+    }
+
+    startWorkerPoolComparePassword() {
+        this.workerPoolComparePass = new WorkerPool(
+            this.cpulength,
+            this.pathWorkerComparePassword,
+        );
+    }
+
+    getWorkerPoolComparePassword() {
+        return this.workerPoolComparePass;
     }
 
     startWorkerPoolSignJwt() {

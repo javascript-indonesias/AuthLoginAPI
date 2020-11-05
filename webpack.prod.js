@@ -104,7 +104,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: 'package.json', to: './' },
-                { from: 'package-lock.json', to: './' },
+                { from: 'pnpm-lock.yaml', to: './' },
                 { from: 'DEPLOY-README.txt', to: './' },
                 { from: '.env', to: './' },
                 { from: 'winston-logs', to: './winston-logs' },

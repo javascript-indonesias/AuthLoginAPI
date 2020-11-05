@@ -6,6 +6,7 @@ import getCovidRoutes from './covid-route-sample';
 import getMockRoutes from './mock-data';
 import getValidasiTesRoutes from './validation-testing';
 
+import getAuthAPIRoutes from './authuser-api-router';
 import getRecipeListRoutes from './recipes-view-router';
 
 function getRoutes() {
@@ -35,16 +36,16 @@ function getValidationTesRouter() {
     return router;
 }
 
-function getViewRecipesRouter() {
+function getAuthAPIRouter() {
     const router = express.Router();
-    router.use('/', getRecipeListRoutes);
+    router.use('/auth', getAuthAPIRoutes());
     return router;
 }
 
-export {
-    getViewRecipesRouter,
-    getRoutes,
-    getCovidRouter,
-    getMockDataRouter,
-    getValidationTesRouter,
-};
+function getViewRecipesRouter() {
+    const router = express.Router();
+    router.use('/', getRecipeListRoutes());
+    return router;
+}
+
+export { getViewRecipesRouter, getAuthAPIRouter };
