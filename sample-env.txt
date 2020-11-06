@@ -9,5 +9,7 @@ VERSIONAPP="v100"
 MONGODBURI=""
 NODE_ENV="development"
 SECRETJWT=""
+HASHTYPE="bcrypt"
+# HASHTYPE="argon2"
 # NODE_ENV="production"
 

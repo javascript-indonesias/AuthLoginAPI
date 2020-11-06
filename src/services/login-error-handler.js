@@ -28,6 +28,24 @@ function handleErrorLogin(errorObject) {
     return errObjectParsed;
 }
 
+function handleErrorLoginDatabase(error) {
+    const errMessage = error.message;
+    const errObjectParsed = { email: '', password: '' };
+
+    if (
+        errMessage.toLowerCase().includes('email pengguna') &&
+        errMessage.toLowerCase().includes('tidak ditemukan')
+    ) {
+        errObjectParsed.email = errMessage;
+    }
+
+    if (errMessage.toLowerCase().includes('kata sandi')) {
+        errObjectParsed.password = errMessage;
+    }
+
+    return errObjectParsed;
+}
+
 function handleErrorLoginSignup(error) {
     const errorMessage = error.message;
     const errorObject = { email: '', password: '' };
@@ -61,4 +79,4 @@ function handleErrorLoginSignup(error) {
     return errorObject;
 }
 
-export { handleErrorLogin, handleErrorLoginSignup };
+export { handleErrorLogin, handleErrorLoginSignup, handleErrorLoginDatabase };

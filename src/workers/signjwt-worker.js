@@ -19,7 +19,7 @@ function createJwtToken(usermodel, secretjwt) {
                 if (error) {
                     reject(error);
                 } else {
-                    resolve({ accessToken: token, datauser: usermodel });
+                    resolve({ accesstoken: token, datauser: usermodel });
                 }
             },
         );

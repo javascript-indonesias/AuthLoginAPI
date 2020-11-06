@@ -44,12 +44,16 @@ async function getDataUser(email) {
         if (userData) {
             return Promise.resolve(userData);
         }
-        return Promise.reject(new Error(`Pengguna ${email} tidak ditemukan`));
+        return Promise.reject(
+            new Error(`Email pengguna ${email} tidak ditemukan`),
+        );
     } catch (err) {
-        logger.error(`Pengguna ${email} tidak ditemukan`);
+        logger.error(`Email pengguna ${email} tidak ditemukan`);
         return Promise.reject(
             new Error(
-                `Pengguna ${email} tidak ditemukan ${JSON.stringify(err)}`,
+                `Email pengguna ${email} tidak ditemukan ${JSON.stringify(
+                    err,
+                )}`,
             ),
         );
     }
