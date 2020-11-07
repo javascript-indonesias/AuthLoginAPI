@@ -40,7 +40,8 @@ async function createUserDb(useritem) {
 
 async function getDataUser(email) {
     try {
-        const userData = await UserItem.findOne({ email }).exec();
+        logger.warn(`Ambil data email pengguna ${email}`);
+        const userData = await UserItem.findOne({ email: `${email}` }).exec();
         if (userData) {
             return Promise.resolve(userData);
         }

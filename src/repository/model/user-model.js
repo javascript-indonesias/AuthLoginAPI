@@ -8,7 +8,7 @@ import { generateMixedID } from '../../utils/id-generators';
 // Cara lain bisa dilihat disini
 // DOCUMENTATION https://blog.logrocket.com/building-a-password-hasher-in-node-js/
 // DOCUMENTATION https://www.toptal.com/nodejs/secure-rest-api-in-nodejs
-const UserSchema = new Schema(
+const userSchema = new Schema(
     {
         userids: {
             type: String,
@@ -50,14 +50,20 @@ function preSaveDataUser() {
     return Promise.resolve(this);
 }
 
+function debuggerQuery() {
+    logger.info('Query data dilakukan');
+    return Promise.resolve(this);
+}
+
 // https://mongoosejs.com/docs/middleware.html#pre\
 // Aksi yang dijalankan sebelum  data disimpan
-UserSchema.pre('save', preSaveDataUser);
+userSchema.pre('save', preSaveDataUser);
+userSchema.pre('findOne', debuggerQuery);
 // Aksi database dijalankan setelah proses save di jalankan
-UserSchema.post('save', (docs, next) => {
+userSchema.post('save', (docs, next) => {
     logger.info(`Data user berhasil disimpan ${JSON.stringify(docs)}`);
     next();
 });
 
-const UserItem = model('usermodel', UserSchema);
+const UserItem = model('useritem', userSchema);
 export default UserItem;

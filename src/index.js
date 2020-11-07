@@ -74,8 +74,8 @@ function runServerNodeJSMongoDb() {
 }
 
 // Jalankan server sesuai kebutuhan
-runServerNodeJS();
-// runServerNodeJSMongoDb();
+// runServerNodeJS();
+runServerNodeJSMongoDb();
 
 // Untuk menguji API akses dengan Postman atau Insomnia dengan
 // Contoh URL API berikut

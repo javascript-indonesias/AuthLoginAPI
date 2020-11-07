@@ -60,6 +60,6 @@ POST http://localhost:3200/api/v1/auth/login
 Content-Type: application/json
 
 {
-    "email": "      ",
-    "password": "      "
+    "email": "kucing@gmail.com",
+    "password": "kucing1234"
 }

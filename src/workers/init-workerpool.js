@@ -5,6 +5,7 @@ import WorkerPool from './workerpool-threads';
 class WorkerPoolInit {
     constructor() {
         this.cpulength = os.cpus.length;
+        this.cpulength = 1;
         this.pathWorkerHash = path.resolve(
             __dirname,
             'hashpasswords-worker.js',

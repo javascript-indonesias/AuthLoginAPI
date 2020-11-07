@@ -5,6 +5,7 @@ import {
 import logger from '../utils/config-winston';
 import { secretjwt } from '../../config';
 import { maxAgeToken, HASH_TYPE_BCRYPT } from '../utils/konstans-data';
+import UserItem from '../repository/model/user';
 
 import {
     validateEmailUser,
@@ -14,9 +15,9 @@ import {
     handleErrorLogin,
     handleErrorLoginDatabase,
 } from '../services/login-error-handler';
-import { getDataUser } from '../repository/auth-repo';
+import { getDataUser, getDataUserByUserId } from '../repository/auth-repo';
 
-let userItemDatabase = {};
+const userItemDatabase = {};
 
 async function getSignedJwtWorkers(res) {
     // Buat signet JWT dengan worker
@@ -87,16 +88,24 @@ async function getUserDataFromDatabase(email, password, res) {
     // Ambil data pengguna dari database
     try {
         const resultUserData = await getDataUser(email);
-        if (resultUserData) {
-            userItemDatabase = resultUserData;
-            // komparasi password dari database
-            const workerdata = {
-                typehash: HASH_TYPE_BCRYPT,
-                plainpass: password,
-                passhashdb: resultUserData.passsword,
-            };
-            comparePasswordUserWorker(workerdata);
-        }
+        getDataUser(email)
+            .then((result) => {
+                res.json({ result, resultUserData });
+            })
+            .catch((err) => {
+                res.json({ error: err });
+            });
+        // res.json({ email, password });
+        // if (resultUserData) {
+        //     userItemDatabase = resultUserData;
+        //     // komparasi password dari database
+        //     const workerdata = {
+        //         typehash: HASH_TYPE_BCRYPT,
+        //         plainpass: password,
+        //         passhashdb: resultUserData.passsword,
+        //     };
+        //     comparePasswordUserWorker(workerdata);
+        // }
     } catch (err) {
         logger.error(`Error query login database ${err.stack}`);
         const errorObject = handleErrorLoginDatabase(err);

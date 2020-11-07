@@ -46,7 +46,7 @@ function setupCloseOnExit(server) {
             .close()
             .then(() => {
                 return new Promise((resolve) => {
-                    workerPoolInit.stopAllWorkerPool();
+                    // workerPoolInit.stopAllWorkerPool();
                     resolve(true);
                 });
             })
@@ -79,10 +79,10 @@ function setupCloseOnExit(server) {
 
 function startServer({ port = process.env.PORT } = {}) {
     // Inisialisasi worker thread pool
-    workerPoolInit.startWorkerPoolHashPassword();
-    workerPoolInit.startWorkerPoolComparePassword();
-    workerPoolInit.startWorkerPoolSignJwt();
-    workerPoolInit.startWorkerPoolVerifyJwt();
+    // workerPoolInit.startWorkerPoolHashPassword();
+    // workerPoolInit.startWorkerPoolComparePassword();
+    // workerPoolInit.startWorkerPoolSignJwt();
+    // workerPoolInit.startWorkerPoolVerifyJwt();
 
     const jsonBodyParser = bodyParser.json();
 
