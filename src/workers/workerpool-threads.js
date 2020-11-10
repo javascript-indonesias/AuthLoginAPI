@@ -1,16 +1,17 @@
-import { EventEmitter } from 'events';
-import path from 'path';
-import { Worker } from 'worker_threads';
-import logger from '../utils/config-winston';
-
-import WorkerPoolTaskInfo from './workerpool-taskinfo';
+// Untuk yang berhubungan dengan Worker dan Worker JS, menggunakan require dan commonJS,
+// agar terhindar dari bugs dan keanehan compiler dari Babel JS
+const { EventEmitter } = require('events');
+const path = require('path');
+const { Worker } = require('worker_threads');
+const WorkerPoolTaskInfo = require('./workerpool-taskinfo');
+const logger = require('../utils/config-winston');
 
 const WORKER_STATUS = {
     IDLE: Symbol('idle'),
     BUSY: Symbol('busy'),
 };
 
-export default class WorkerPool extends EventEmitter {
+class WorkerPool extends EventEmitter {
     constructor(numThreads, workerPathName) {
         super();
         this.numThreads = numThreads;
@@ -72,3 +73,5 @@ export default class WorkerPool extends EventEmitter {
         }
     }
 }
+
+module.exports = { WorkerPool, WORKER_STATUS };

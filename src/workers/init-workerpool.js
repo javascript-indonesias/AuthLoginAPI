@@ -1,20 +1,30 @@
-import path from 'path';
-import os from 'os';
-import WorkerPool from './workerpool-threads';
+// Untuk yang berhubungan dengan Worker dan Worker JS, menggunakan require dan commonJS,
+// agar terhindar dari bugs dan keanehan compiler dari Babel JS
+const path = require('path');
+const os = require('os');
+const config = require('../../config');
+const { WorkerPool } = require('./workerpool-threads');
 
 class WorkerPoolInit {
     constructor() {
         this.cpulength = os.cpus.length;
-        this.cpulength = 1;
+        // Untuk debugging, set cpu length ke 1
+        if (config.mode === 'development') {
+            this.cpulength = 1;
+        }
+
         this.pathWorkerHash = path.resolve(
             __dirname,
             'hashpasswords-worker.js',
         );
+
         this.pathWorkerSignJwt = path.resolve(__dirname, 'signjwt-worker.js');
+
         this.pathWorkerVerifyJwt = path.resolve(
             __dirname,
             'verifyjwt-worker.js',
         );
+
         this.pathWorkerComparePassword = path.resolve(
             __dirname,
             'comparepassword-worker.js',
@@ -84,4 +94,4 @@ class WorkerPoolInit {
 }
 
 const workerPoolInit = new WorkerPoolInit();
-export default workerPoolInit;
+module.exports = { workerPoolInit };

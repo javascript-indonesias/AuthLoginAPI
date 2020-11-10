@@ -48,4 +48,4 @@ function getViewRecipesRouter() {
     return router;
 }
 
-export { getViewRecipesRouter, getAuthAPIRouter };
+export { getViewRecipesRouter, getAuthAPIRouter, getRoutes };

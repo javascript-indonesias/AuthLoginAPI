@@ -51,8 +51,8 @@ function preSaveDataUser() {
 }
 
 function debuggerQuery() {
+    // Query tidak ada return this seperti save
     logger.info('Query data dilakukan');
-    return Promise.resolve(this);
 }
 
 // https://mongoosejs.com/docs/middleware.html#pre\

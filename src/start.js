@@ -12,7 +12,7 @@ import { getAuthAPIRouter, getViewRecipesRouter } from './routes';
 import { rateLimiter, speedLimiter } from './utils/options-value';
 import { corsAllRequest, corsRequest } from './utils/cors-options';
 import { mode } from '../config';
-import workerPoolInit from './workers/init-workerpool';
+import { workerPoolInit } from './workers/init-workerpool';
 
 // here's our generic error handler for situations where we didn't handle
 // errors properly
@@ -46,11 +46,11 @@ function setupCloseOnExit(server) {
             .close()
             .then(() => {
                 return new Promise((resolve) => {
-                    // workerPoolInit.stopAllWorkerPool();
                     resolve(true);
                 });
             })
             .then(() => {
+                workerPoolInit.stopAllWorkerPool();
                 logger.info('Server successfully closed');
             })
             .catch((e) => {
@@ -58,11 +58,9 @@ function setupCloseOnExit(server) {
             });
 
         if (options.exit) {
-            if (options.exit) {
-                // eslint-disable-next-line no-process-exit
-                process.exit();
-                // throw new Error('Exit process.exit Node JS');
-            }
+            // eslint-disable-next-line no-process-exit
+            process.exit();
+            // throw new Error('Exit process.exit Node JS');
         }
     }
 
@@ -78,12 +76,6 @@ function setupCloseOnExit(server) {
 }
 
 function startServer({ port = process.env.PORT } = {}) {
-    // Inisialisasi worker thread pool
-    // workerPoolInit.startWorkerPoolHashPassword();
-    // workerPoolInit.startWorkerPoolComparePassword();
-    // workerPoolInit.startWorkerPoolSignJwt();
-    // workerPoolInit.startWorkerPoolVerifyJwt();
-
     const jsonBodyParser = bodyParser.json();
 
     const app = express();

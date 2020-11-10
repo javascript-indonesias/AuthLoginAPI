@@ -1,11 +1,16 @@
-import { Worker } from 'worker_threads';
-import path from 'path';
-import os from 'os';
-import logger from '../utils/config-winston';
-import WorkerPool from './workerpool-primes';
+// Untuk yang berhubungan dengan Worker dan Worker JS, menggunakan require dan commonJS,
+// agar terhindar dari bugs dan keanehan compiler dari Babel JS
+const { Worker } = require('worker_threads');
+const path = require('path');
+const os = require('os');
+const logger = require('../utils/config-winston');
 
-import workerPoolInit from './init-workerpool';
-import config from '../../config';
+const config = require('../../config');
+const { workerPoolInit } = require('./init-workerpool');
+const { WorkerPool } = require('./workerpool-threads');
+
+// Inisialiasi worker pool
+// let workerPoolsComparePassword = null;
 
 // fungsi membuat hash password
 function runWorkerHashPassword(workerdata) {
@@ -26,12 +31,33 @@ function runWorkerHashPassword(workerdata) {
     });
 }
 
-function runWorkerComparePassword(workerdata) {
-    return new Promise((resolve, reject) => {
+function runWorkerComparePassword(workerData) {
+    // Jalankan task sebanyak 10 buah task
+    // const pathWorkerPrimepool = path.resolve(
+    //     __dirname,
+    //     'comparepassword-worker.js',
+    // );
+
+    if (workerPoolInit.getWorkerPoolComparePassword() === null) {
+        workerPoolInit.startWorkerPoolComparePassword();
+        // if (config.mode === 'development') {
+        //     workerPoolsComparePassword = new WorkerPool(2, pathWorkerPrimepool);
+        // } else {
+        //     workerPoolsComparePassword = new WorkerPool(
+        //         os.cpus().length,
+        //         pathWorkerPrimepool,
+        //     );
+        // }
+    }
+
+    // Menjalankan task secara banyak sekaligus,
+    // atau bulk processing dengan Worker Pool Thread
+    const arrayPromise = [];
+    const promise = new Promise((resolve, reject) => {
         workerPoolInit
             .getWorkerPoolComparePassword()
-            .runTask(workerdata, (errors, results) => {
-                const stringDebug = `${JSON.stringify(errors)} ${JSON.stringify(
+            .runTask(workerData, (errors, results) => {
+                const stringDebug = `Callback error ${errors}, result ${JSON.stringify(
                     results,
                 )}`;
                 logger.info(stringDebug);
@@ -42,11 +68,31 @@ function runWorkerComparePassword(workerdata) {
                 }
             });
     });
+    arrayPromise.push(promise);
+
+    return Promise.allSettled(arrayPromise)
+        .then((results) => {
+            // workerPoolsComparePassword.close();
+            const result = results[0];
+            if (result.status === 'fulfilled') {
+                return Promise.resolve(result.value);
+            }
+
+            return Promise.reject(new Error('Password tidak cocok'));
+        })
+        .catch((error) => {
+            logger.error(error);
+            return Promise.reject(error);
+        });
 }
 
 // fungsi membuat sign jwt
 function runWorkerSignJwt(workerdata) {
     return new Promise((resolve, reject) => {
+        if (workerPoolInit.getWorkerPoolSignJwt() === null) {
+            workerPoolInit.startWorkerPoolSignJwt();
+        }
+
         workerPoolInit
             .getWorkerPoolSignJwt()
             .runTask(workerdata, (errors, results) => {

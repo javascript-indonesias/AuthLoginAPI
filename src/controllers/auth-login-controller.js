@@ -5,7 +5,6 @@ import {
 import logger from '../utils/config-winston';
 import { secretjwt } from '../../config';
 import { maxAgeToken, HASH_TYPE_BCRYPT } from '../utils/konstans-data';
-import UserItem from '../repository/model/user';
 
 import {
     validateEmailUser,
@@ -15,9 +14,9 @@ import {
     handleErrorLogin,
     handleErrorLoginDatabase,
 } from '../services/login-error-handler';
-import { getDataUser, getDataUserByUserId } from '../repository/auth-repo';
+import { getDataUser } from '../repository/auth-repo';
 
-const userItemDatabase = {};
+let userItemDatabase = {};
 
 async function getSignedJwtWorkers(res) {
     // Buat signet JWT dengan worker
@@ -57,22 +56,29 @@ async function getSignedJwtWorkers(res) {
 async function comparePasswordUserWorker(workerdata, res) {
     // Jalankan worker thread untuk komparasi password
     try {
-        const isPasswordOk = await runWorkerComparePassword(workerdata);
-        if (isPasswordOk === true) {
-            // Pengguna ada di database dan compare password berhasil
-            // Lanjutkan proses buat JWT
-            getSignedJwtWorkers(res);
-        } else {
-            // Password salah dan tidak benar
-            const error = new Error('Kata sandi tidak sama');
-            error.status = 100;
-            const errorObject = handleErrorLoginDatabase(error);
-            res.status(400).json({
-                message: 'Kata sandi tidak cocok',
-                error: errorObject,
-            });
-        }
+        const resultCompareData = await runWorkerComparePassword(workerdata);
+        logger.info(
+            `Hasil komparasi password selesai ${JSON.stringify(
+                resultCompareData,
+            )}`,
+        );
+        res.status(200).json({ hasil_compare: resultCompareData.result });
+        // if (isPasswordOk === true) {
+        //     // Pengguna ada di database dan compare password berhasil
+        //     // Lanjutkan proses buat JWT
+        //     getSignedJwtWorkers(res);
+        // } else {
+        //     // Password salah dan tidak benar
+        //     const error = new Error('Kata sandi tidak sama');
+        //     error.status = 100;
+        //     const errorObject = handleErrorLoginDatabase(error);
+        //     res.status(400).json({
+        //         message: 'Kata sandi tidak cocok',
+        //         error: errorObject,
+        //     });
+        // }
     } catch (err) {
+        console.log(err);
         const error = new Error('Kata sandi tidak sama');
         error.status = 100;
         error.stack = err;
@@ -85,27 +91,20 @@ async function comparePasswordUserWorker(workerdata, res) {
 }
 
 async function getUserDataFromDatabase(email, password, res) {
-    // Ambil data pengguna dari database
+    // Ambil data pengguna dari database mongodb
     try {
         const resultUserData = await getDataUser(email);
-        getDataUser(email)
-            .then((result) => {
-                res.json({ result, resultUserData });
-            })
-            .catch((err) => {
-                res.json({ error: err });
-            });
-        // res.json({ email, password });
-        // if (resultUserData) {
-        //     userItemDatabase = resultUserData;
-        //     // komparasi password dari database
-        //     const workerdata = {
-        //         typehash: HASH_TYPE_BCRYPT,
-        //         plainpass: password,
-        //         passhashdb: resultUserData.passsword,
-        //     };
-        //     comparePasswordUserWorker(workerdata);
-        // }
+        logger.warn(JSON.stringify(resultUserData));
+        if (resultUserData) {
+            userItemDatabase = resultUserData;
+            // komparasi password dari database
+            const workerdata = {
+                typehash: HASH_TYPE_BCRYPT,
+                plainpass: password,
+                passhashdb: resultUserData.password,
+            };
+            comparePasswordUserWorker(workerdata, res);
+        }
     } catch (err) {
         logger.error(`Error query login database ${err.stack}`);
         const errorObject = handleErrorLoginDatabase(err);
