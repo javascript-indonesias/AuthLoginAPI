@@ -32,22 +32,8 @@ function runWorkerHashPassword(workerdata) {
 }
 
 function runWorkerComparePassword(workerData) {
-    // Jalankan task sebanyak 10 buah task
-    // const pathWorkerPrimepool = path.resolve(
-    //     __dirname,
-    //     'comparepassword-worker.js',
-    // );
-
     if (workerPoolInit.getWorkerPoolComparePassword() === null) {
         workerPoolInit.startWorkerPoolComparePassword();
-        // if (config.mode === 'development') {
-        //     workerPoolsComparePassword = new WorkerPool(2, pathWorkerPrimepool);
-        // } else {
-        //     workerPoolsComparePassword = new WorkerPool(
-        //         os.cpus().length,
-        //         pathWorkerPrimepool,
-        //     );
-        // }
     }
 
     // Menjalankan task secara banyak sekaligus,
@@ -70,6 +56,7 @@ function runWorkerComparePassword(workerData) {
     });
     arrayPromise.push(promise);
 
+    // Jalankan semua task secara paralel dengan Promise All Settled
     return Promise.allSettled(arrayPromise)
         .then((results) => {
             // workerPoolsComparePassword.close();
@@ -88,25 +75,51 @@ function runWorkerComparePassword(workerData) {
 
 // fungsi membuat sign jwt
 function runWorkerSignJwt(workerdata) {
-    return new Promise((resolve, reject) => {
-        if (workerPoolInit.getWorkerPoolSignJwt() === null) {
-            workerPoolInit.startWorkerPoolSignJwt();
-        }
-
+    if (workerPoolInit.getWorkerPoolSignJwt() === null) {
+        workerPoolInit.startWorkerPoolSignJwt();
+    }
+    // Menjalankan task secara banyak sekaligus,
+    // atau bulk processing dengan Worker Pool Thread
+    const arrayPromise = [];
+    const promiseSign = new Promise((resolve, reject) => {
         workerPoolInit
             .getWorkerPoolSignJwt()
             .runTask(workerdata, (errors, results) => {
-                const stringDebug = `${JSON.stringify(errors)} ${JSON.stringify(
+                const stringDebug = `Callback error ${errors}, result ${JSON.stringify(
                     results,
                 )}`;
                 logger.info(stringDebug);
                 if (errors) {
                     reject(errors);
                 } else {
-                    resolve(results);
+                    if (results.accesstoken) {
+                        resolve(results);
+                    } else {
+                        reject(errors);
+                    }
                 }
             });
     });
+
+    arrayPromise.push(promiseSign);
+
+    // Jalankan semua task secara paralel dengan Promise All Settled
+    return Promise.allSettled(arrayPromise)
+        .then((results) => {
+            // workerPoolsComparePassword.close();
+            const result = results[0];
+            if (result.status === 'fulfilled') {
+                return Promise.resolve(result.value);
+            }
+
+            return Promise.reject(
+                new Error('Gagal menandatangani access token'),
+            );
+        })
+        .catch((error) => {
+            logger.error(error);
+            return Promise.reject(error);
+        });
 }
 
 // fungsi verifikasi token jwt
