@@ -46,7 +46,6 @@ async function comparePasswordArgon(plainpassword, dbhashpassword) {
 parentPort.on('message', (workerdata) => {
     // Terima pesan proses dan jalankan di thread proses terpisah
     const typeIdHash = workerdata.typehash;
-
     if (typeIdHash === 'bcrypt') {
         comparePasswordBcrypt(workerdata.plainpass, workerdata.passhashdb)
             .then((result) => {

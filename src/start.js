@@ -8,11 +8,11 @@ import cookieParser from 'cookie-parser';
 import 'express-async-errors';
 import logger from './utils/config-winston';
 // all the routes for my app are retrieved from the src/routes/index.js module
-import { getAuthAPIRouter, getViewRecipesRouter } from './routes';
+import { getAuthAPIRouter, getViewRecipesRouter, getRoutes } from './routes';
 import { rateLimiter, speedLimiter } from './utils/options-value';
 import { corsAllRequest, corsRequest } from './utils/cors-options';
 import { mode } from '../config';
-import { workerPoolInit } from './workers/init-workerpool';
+// import { workerPoolInit } from './workers/init-workerpool';
 
 // here's our generic error handler for situations where we didn't handle
 // errors properly
@@ -50,7 +50,6 @@ function setupCloseOnExit(server) {
                 });
             })
             .then(() => {
-                workerPoolInit.stopAllWorkerPool();
                 logger.info('Server successfully closed');
             })
             .catch((e) => {
@@ -108,6 +107,16 @@ function startServer({ port = process.env.PORT } = {}) {
         jsonBodyParser,
         helmet(),
         getAuthAPIRouter(),
+    );
+
+    app.use(
+        '/api/v2',
+        rateLimiter,
+        speedLimiter,
+        corsRequest,
+        jsonBodyParser,
+        helmet(),
+        getRoutes(),
     );
 
     // Router view SSR EJS

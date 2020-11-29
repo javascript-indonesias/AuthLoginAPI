@@ -4,7 +4,6 @@
 // Sehingga aplikasi tetap responsif ketika proses kalkulasi
 // komputasi berat di jalankan
 import { parentPort } from 'worker_threads';
-import bcrypt from 'bcrypt';
 
 const min = 2;
 const primes = [];
@@ -13,9 +12,6 @@ const primes = [];
 function generatePrimes(start, range) {
     let isPrime = true;
     const end = start + range;
-
-    const salts = bcrypt.genSaltSync(15);
-
     for (let i = start; i < end; i += 1) {
         for (let j = min; j < Math.sqrt(end); j += 1) {
             if (i !== j && i % j === 0) {
@@ -24,8 +20,7 @@ function generatePrimes(start, range) {
             }
         }
         if (isPrime) {
-            const hashedPasswords = bcrypt.hashSync(`password${i}`, salts);
-            primes.push(hashedPasswords);
+            primes.push(i);
         }
         isPrime = true;
     }

@@ -3,7 +3,7 @@
 const path = require('path');
 const os = require('os');
 const config = require('../../config');
-const { WorkerPool } = require('./workerpool-threads');
+const { WorkerPool } = require('./workerpool-primes');
 
 class WorkerPoolInit {
     constructor() {

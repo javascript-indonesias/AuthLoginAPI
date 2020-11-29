@@ -56,6 +56,7 @@ async function getSignedJwtWorkers(res) {
 async function comparePasswordUserWorker(workerdata, res) {
     // Jalankan worker thread untuk komparasi password
     try {
+        console.log('Compare password dimulai');
         const resultCompareData = await runWorkerComparePassword(workerdata);
         logger.info(
             `Hasil komparasi password selesai ${JSON.stringify(
@@ -65,7 +66,7 @@ async function comparePasswordUserWorker(workerdata, res) {
         res.status(200).json({ hasil_compare: resultCompareData.result });
 
         const isPasswordOk = resultCompareData.result;
-        if (isPasswordOk === true && !error) {
+        if (isPasswordOk === true) {
             // Pengguna ada di database dan compare password berhasil
             // Lanjutkan proses buat JWT
             getSignedJwtWorkers(res);

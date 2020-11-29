@@ -16,6 +16,7 @@ export default class WorkerPool extends EventEmitter {
         this.numThreads = numThreads;
         this.workers = [];
         this.freeWorkers = [];
+        this.workerPathName = workerPathName;
 
         for (let i = 0; i < numThreads; i += 1) {
             this.addNewWorker(workerPathName);
@@ -28,13 +29,16 @@ export default class WorkerPool extends EventEmitter {
             // In case of success: Call the callback that was passed to `runTask`,
             // remove the `Busy worker` associated with the Worker, and mark it as free
             // again.
+            console.log(`Result data ${result}`);
             worker[WORKER_STATUS.BUSY].done(null, result);
             worker[WORKER_STATUS.BUSY] = null;
             this.freeWorkers.push(worker);
             this.emit(WORKER_STATUS.IDLE);
+            console.log(`Panjang free worker ${this.freeWorkers.length}`);
         });
 
         worker.on('error', (err) => {
+            console.log(`Worker error ${err.stack}`);
             // In case of an uncaught exception: Call the callback that was passed to
             // `runTask` with the error.
             if (worker[WORKER_STATUS.BUSY]) {
@@ -45,7 +49,7 @@ export default class WorkerPool extends EventEmitter {
             // Remove the worker from the list and start a new Worker to replace the
             // current one.
             this.workers.splice(this.workers.indexOf(worker), 1);
-            this.addNewWorker();
+            this.addNewWorker(this.workerPathName);
         });
 
         this.workers.push(worker);
